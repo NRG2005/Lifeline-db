@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests - Diagnostic Centre</title>
+    <!-- This one script loads all the professional styling (Tailwind CSS) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="flex min-h-screen">
+    
+    <!-- Sidebar -->
+    <div class="w-64 bg-slate-900 text-white p-6 flex flex-col">
+      <div class="mb-10">
+        <h1 class="text-2xl font-bold">Lifeline.DB</h1>
+        <p class="text-sm text-slate-400">Diagnostic Centre</p>
+      </div>
+      <nav class="flex-1">
+        <ul class="space-y-2">
+          <li><a href="index.html" class="block py-2 px-4 rounded hover:bg-slate-800">Dashboard</a></li>
+          <li><a href="patients.html" class="block py-2 px-4 rounded hover:bg-slate-800">Patients</a></li>
+          <!-- This link is highlighted because this IS the Tests page -->
+          <li><a href="tests.html" class="block py-2 px-4 rounded bg-blue-600 text-white">Tests</a></li>
+          <li><a href="staff.html" class="block py-2 px-4 rounded hover:bg-slate-800">Staff</a></li>
+        </ul>
+      </nav>
+      <div class="text-sm text-slate-500">
+        <p>&copy; 2025 Lifeline Diagnostics</p>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 p-10">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">Test Schedule</h2>
+        <button class="bg-blue-600 text-white font-medium py-2 px-5 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+          Schedule New Test
+        </button>
+      </div>
+      
+      <!-- Test List Table -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <table class="w-full text-left">
+          <thead class="bg-gray-200">
+            <tr>
+              <th class="p-4">Test ID</th>
+              <th class="p-4">Test Name</th>
+              <th class="p-4">Patient ID</th>
+              <th class="p-4">Doctor ID</th>
+              <th class="p-4">Dept ID</th>
+              <th class="p-4">Test Date</th>
+              <th class="p-4">Status</th>
+            </tr>
+          </thead>
+          <!-- This table body will be filled by our script -->
+          <tbody id="test-table-body">
+            <tr>
+              <td colspan="7" class="p-4 text-center text-gray-500">Loading test data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NEW SCRIPT TO FETCH DATA -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const tableBody = document.getElementById('test-table-body');
+      
+      // Fetch data from our new API endpoint
+      fetch('/api/tests')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Network error: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(tests => {
+          // Clear the "Loading..." message
+          tableBody.innerHTML = ''; 
+
+          if (tests.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500">No tests found in the database.</td></tr>';
+            return;
+          }
+
+          // Loop through each test and create a table row
+          tests.forEach(test => {
+            const row = document.createElement('tr');
+            row.classList.add('border-b', 'hover:bg-gray-50');
+            
+            // Format the date to be more readable (YYYY-MM-DD)
+            const testDate = new Date(test.test_date).toISOString().split('T')[0];
+            
+            // Create status badge
+            let statusBadge;
+            const status = test.status ? test.status.toLowerCase() : 'pending';
+            if (status === 'pending') {
+              statusBadge = `<span class="bg-yellow-200 text-yellow-800 font-medium py-1 px-3 rounded-full">Pending</span>`;
+            } else if (status === 'scheduled') {
+              statusBadge = `<span class="bg-blue-200 text-blue-800 font-medium py-1 px-3 rounded-full">Scheduled</span>`;
+            } else {
+              statusBadge = `<span class="bg-green-200 text-green-800 font-medium py-1 px-3 rounded-full">Completed</span>`;
+            }
+
+            row.innerHTML = `
+              <td class="p-4">${test.test_id}</td>
+              <td class="p-4 font-medium text-gray-900">${test.test_name}</td>
+              <td class="p-4 text-gray-700">${test.patient_id}</td>
+              <td class="p-4 text-gray-700">${test.doctor_id}</td>
+              <td class="p-4 text-gray-700">${test.department_id}</td>
+              <td class="p-4 text-gray-700">${testDate}</td>
+              <td class="p-4">${statusBadge}</td>
+            `;
+            
+            tableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching tests:', error);
+          // Show a helpful error message in the table
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7" class="p-4 text-center text-red-600">
+                <strong>Error loading data.</strong>
+                <p class.="text-sm">Is the backend server (server.js) running?</p>
+              </td>
+            </tr>`;
+        });
+    });
+  </script>
+</body>
+</html>

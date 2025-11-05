@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff - Diagnostic Centre</title>
+    <!-- This one script loads all the professional styling (Tailwind CSS) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="flex min-h-screen">
+    
+    <!-- Sidebar -->
+    <div class="w-64 bg-slate-900 text-white p-6 flex flex-col">
+      <div class="mb-10">
+        <h1 class="text-2xl font-bold">Lifeline.DB</h1>
+        <p class="text-sm text-slate-400">Diagnostic Centre</p>
+      </div>
+      <nav class="flex-1">
+        <ul class="space-y-2">
+          <li><a href="index.html" class="block py-2 px-4 rounded hover:bg-slate-800">Dashboard</a></li>
+          <li><a href="patients.html" class="block py-2 px-4 rounded hover:bg-slate-800">Patients</a></li>
+          <li><a href="tests.html" class="block py-2 px-4 rounded hover:bg-slate-800">Tests</a></li>
+          <!-- This link is highlighted because this IS the Staff page -->
+          <li><a href="staff.html" class="block py-2 px-4 rounded bg-blue-600 text-white">Staff</a></li>
+        </ul>
+      </nav>
+      <div class="text-sm text-slate-500">
+        <p>&copy; 2025 Lifeline Diagnostics</p>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 p-10">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">Staff Directory</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Referring Doctors List -->
+        <div>
+          <h3 class="text-2xl font-semibold text-gray-700 mb-4">Referring Doctors</h3>
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="p-4">Name</th>
+                  <th class="p-4">Specialization</th>
+                  <th class="p-4">Contact</th>
+                </tr>
+              </thead>
+              <tbody id="doctor-table-body">
+                <tr>
+                  <td colspan="3" class="p-4 text-center text-gray-500">Loading doctor data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Lab Staff / Reviewers List -->
+        <div>
+          <h3 class="text-2xl font-semibold text-gray-700 mb-4">Lab Staff (Reviewers)</h3>
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="p-4">Name</th>
+                  <th class="p-4">Role</th>
+                  <th class="p-4">Department</th>
+                </tr>
+              </thead>
+              <tbody id="reviewer-table-body">
+                <tr>
+                  <td colspan="3" class="p-4 text-center text-gray-500">Loading reviewer data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NEW SCRIPT TO FETCH DATA FOR BOTH TABLES -->
+  <script>
+    // Helper function to show errors
+    function showError(tableBody, colSpan, message) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="${colSpan}" class="p-4 text-center text-red-600">
+            <strong>Error loading data.</strong>
+            <p class="text-sm">${message}</p>
+          </td>
+        </tr>`;
+    }
+
+    // This runs when the page is finished loading
+    window.addEventListener('DOMContentLoaded', () => {
+      
+      // --- 1. Fetch Doctors ---
+      const doctorTableBody = document.getElementById('doctor-table-body');
+      fetch('/api/doctors')
+        .then(response => {
+          if (!response.ok) throw new Error('Network error');
+          return response.json();
+        })
+        .then(doctors => {
+          doctorTableBody.innerHTML = ''; // Clear loading
+          if (doctors.length === 0) {
+            doctorTableBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No doctors found.</td></tr>';
+            return;
+          }
+          doctors.forEach(doctor => {
+            const row = document.createElement('tr');
+            row.classList.add('border-b', 'hover:bg-gray-50');
+            row.innerHTML = `
+              <td class="p-4 font-medium text-gray-900">Dr. ${doctor.first_name} ${doctor.last_name}</td>
+              <td class="p-4 text-gray-700">${doctor.specialization}</td>
+              <td class="p-4 text-gray-700">${doctor.contact_number}</td>
+            `;
+            doctorTableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching doctors:', error);
+          showError(doctorTableBody, 3, 'Could not fetch doctor data.');
+        });
+
+      // --- 2. Fetch Reviewers ---
+      const reviewerTableBody = document.getElementById('reviewer-table-body');
+      fetch('/api/reviewers')
+        .then(response => {
+          if (!response.ok) throw new Error('Network error');
+          return response.json();
+        })
+        .then(reviewers => {
+          reviewerTableBody.innerHTML = ''; // Clear loading
+          if (reviewers.length === 0) {
+            reviewerTableBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No reviewers found.</td></tr>';
+            return;
+          }
+          reviewers.forEach(reviewer => {
+            const row = document.createElement('tr');
+            row.classList.add('border-b', 'hover:bg-gray-50');
+            row.innerHTML = `
+              <td class="p-4 font-medium text-gray-900">${reviewer.first_name} ${reviewer.last_name}</td>
+              <td class="p-4 text-gray-700">${reviewer.role}</td>
+              <td class="p-4 text-gray-700">${reviewer.department_name || 'N/A'}</td>
+            `;
+            reviewerTableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching reviewers:', error);
+          showError(reviewerTableBody, 3, 'Could not fetch reviewer data.');
+        });
+    });
+  </script>
+</body>
+</html>
