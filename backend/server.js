@@ -1,25 +1,29 @@
 const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
+// Load environment variables from .env file in the parent directory
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const app = express();
-const port = 3001; // We'll run our server on this port
+const port = process.env.PORT || 3001;
 
 // --- 1. DATABASE CONNECTION ---
 // Create a "pool" of connections to your MySQL database
-// !! Replace with your own MySQL password !!
+// Using environment variables for security
 const db = mysql.createPool({
-  host: 'localhost',
-  user: 'root', // Or your MySQL username
-  password: 'YOUR_MYSQL_PASSWORD_HERE', // !! IMPORTANT: CHANGE THIS
-  database: 'lifeline_db'
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 }).promise(); // Use .promise() for modern async/await syntax
 
 
 // --- 2. SERVE STATIC FILES ---
 // This tells Express to serve your HTML, CSS, and JS files
 // from the 'public' folder.
-app.use(express.static(path.join(__dirname, 'public')));
+// Go up one directory (..) since server.js is in 'backend' folder
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 
 // --- 3. CREATE API ENDPOINTS ---
