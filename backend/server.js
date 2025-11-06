@@ -407,6 +407,42 @@ app.delete('/api/tests/:id', async (req, res) => {
   }
 });
 
+// API to delete a patient using stored procedure
+app.delete('/api/patients/:id', async (req, res) => {
+  try {
+    const patientId = req.params.id;
+    
+    // Use the stored procedure to delete patient
+    await db.query('CALL DeletePatient(?)', [patientId]);
+
+    res.json({ 
+      success: true, 
+      message: 'Patient and associated records deleted successfully' 
+    });
+  } catch (err) {
+    console.error('Error deleting patient:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// API to permanently delete a test using stored procedure
+app.delete('/api/tests/:id/permanent', async (req, res) => {
+  try {
+    const testId = req.params.id;
+    
+    // Use the stored procedure to delete test
+    await db.query('CALL DeleteTest(?)', [testId]);
+
+    res.json({ 
+      success: true, 
+      message: 'Test deleted permanently' 
+    });
+  } catch (err) {
+    console.error('Error deleting test:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 
 // --- 4. START THE SERVER ---
 app.listen(port, () => {
