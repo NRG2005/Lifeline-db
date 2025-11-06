@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Lifeline Diagnostics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        medical: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        },
+                        clinical: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-clinical-50">
+  <div class="flex min-h-screen">
+    
+    <!-- Enhanced Sidebar -->
+    <div class="w-72 bg-gradient-to-b from-medical-900 to-clinical-900 text-white shadow-2xl">
+      <!-- Header Section -->
+      <div class="p-6 border-b border-medical-700">
+        <div class="flex items-center space-x-3 mb-2">
+          <div class="w-10 h-10 bg-medical-500 rounded-lg flex items-center justify-center">
+            <i class="fas fa-heartbeat text-white text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-white">Lifeline Diagnostics</h1>
+            <p class="text-xs text-medical-200">Medical Center System</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Navigation -->
+      <nav class="flex-1 p-6">
+        <ul class="space-y-2">
+          <li>
+            <a href="index.html" class="flex items-center space-x-3 py-3 px-4 rounded-xl bg-medical-600 text-white shadow-lg transform transition-all duration-200">
+              <i class="fas fa-chart-line w-5"></i>
+              <span class="font-medium">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="patients.html" class="flex items-center space-x-3 py-3 px-4 rounded-xl hover:bg-medical-800 text-medical-100 hover:text-white transition-all duration-200">
+              <i class="fas fa-users w-5"></i>
+              <span class="font-medium">Patients</span>
+            </a>
+          </li>
+          <li>
+            <a href="tests.html" class="flex items-center space-x-3 py-3 px-4 rounded-xl hover:bg-medical-800 text-medical-100 hover:text-white transition-all duration-200">
+              <i class="fas fa-vials w-5"></i>
+              <span class="font-medium">Laboratory Tests</span>
+            </a>
+          </li>
+          <li>
+            <a href="staff.html" class="flex items-center space-x-3 py-3 px-4 rounded-xl hover:bg-medical-800 text-medical-100 hover:text-white transition-all duration-200">
+              <i class="fas fa-user-md w-5"></i>
+              <span class="font-medium">Medical Staff</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Footer -->
+      <div class="p-6 border-t border-medical-700">
+        <div class="text-xs text-medical-300">
+          <p class="font-medium">Lifeline Diagnostics</p>
+          <p>&copy; 2025 - Medical Excellence</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 bg-white">
+      <!-- Top Header Bar -->
+      <div class="bg-white border-b border-clinical-200 px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-3xl font-bold text-clinical-800">Medical Dashboard</h2>
+            <p class="text-clinical-600 mt-1">Overview of diagnostic center operations</p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 text-clinical-600">
+              <i class="fas fa-calendar-alt"></i>
+              <span class="text-sm font-medium" id="current-date"></span>
+            </div>
+            <div class="w-10 h-10 bg-medical-500 rounded-full flex items-center justify-center">
+              <i class="fas fa-user text-white"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Content -->
+      <div class="p-8">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          
+          <!-- Total Patients Card -->
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-6 text-white">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-blue-100 text-sm font-medium uppercase tracking-wide">Total Patients</p>
+                  <p id="stat-patients" class="text-4xl font-bold mt-2">0</p>
+                  <p class="text-blue-100 text-sm mt-1">Registered in system</p>
+                </div>
+                <div class="w-16 h-16 bg-blue-400 bg-opacity-30 rounded-full flex items-center justify-center">
+                  <i class="fas fa-users text-2xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Pending Tests Card -->
+          <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-6 text-white">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-amber-100 text-sm font-medium uppercase tracking-wide">Pending Tests</p>
+                  <p id="stat-tests" class="text-4xl font-bold mt-2">0</p>
+                  <p class="text-amber-100 text-sm mt-1">Awaiting completion</p>
+                </div>
+                <div class="w-16 h-16 bg-amber-400 bg-opacity-30 rounded-full flex items-center justify-center">
+                  <i class="fas fa-vials text-2xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Total Staff Card -->
+          <div class="bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-6 text-white">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-emerald-100 text-sm font-medium uppercase tracking-wide">Medical Staff</p>
+                  <p id="stat-staff" class="text-4xl font-bold mt-2">0</p>
+                  <p class="text-emerald-100 text-sm mt-1">Active personnel</p>
+                </div>
+                <div class="w-16 h-16 bg-emerald-400 bg-opacity-30 rounded-full flex items-center justify-center">
+                  <i class="fas fa-user-md text-2xl"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-2xl shadow-lg border border-clinical-200 p-6 mb-8">
+          <h3 class="text-xl font-bold text-clinical-800 mb-4 flex items-center">
+            <i class="fas fa-bolt text-medical-500 mr-2"></i>
+            Quick Actions
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <button class="flex flex-col items-center p-4 rounded-xl border-2 border-clinical-200 hover:border-medical-500 hover:bg-medical-50 transition-all duration-200">
+              <i class="fas fa-user-plus text-2xl text-medical-500 mb-2"></i>
+              <span class="text-sm font-medium text-clinical-700">Register Patient</span>
+            </button>
+            <button class="flex flex-col items-center p-4 rounded-xl border-2 border-clinical-200 hover:border-medical-500 hover:bg-medical-50 transition-all duration-200">
+              <i class="fas fa-calendar-plus text-2xl text-medical-500 mb-2"></i>
+              <span class="text-sm font-medium text-clinical-700">Schedule Test</span>
+            </button>
+            <button class="flex flex-col items-center p-4 rounded-xl border-2 border-clinical-200 hover:border-medical-500 hover:bg-medical-50 transition-all duration-200">
+              <i class="fas fa-file-medical text-2xl text-medical-500 mb-2"></i>
+              <span class="text-sm font-medium text-clinical-700">View Reports</span>
+            </button>
+            <button class="flex flex-col items-center p-4 rounded-xl border-2 border-clinical-200 hover:border-medical-500 hover:bg-medical-50 transition-all duration-200">
+              <i class="fas fa-cog text-2xl text-medical-500 mb-2"></i>
+              <span class="text-sm font-medium text-clinical-700">Settings</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-2xl shadow-lg border border-clinical-200 p-6">
+          <h3 class="text-xl font-bold text-clinical-800 mb-4 flex items-center">
+            <i class="fas fa-clock text-medical-500 mr-2"></i>
+            Recent Activity
+          </h3>
+          <div class="space-y-4">
+            <div class="flex items-center p-3 bg-clinical-50 rounded-lg">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-user-plus text-blue-600"></i>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-clinical-800">New patient registered</p>
+                <p class="text-xs text-clinical-600">John Doe - ID: P001</p>
+              </div>
+              <span class="text-xs text-clinical-500">2 hours ago</span>
+            </div>
+            <div class="flex items-center p-3 bg-clinical-50 rounded-lg">
+              <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-check-circle text-green-600"></i>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-clinical-800">Test completed</p>
+                <p class="text-xs text-clinical-600">Blood Test - Patient ID: P002</p>
+              </div>
+              <span class="text-xs text-clinical-500">4 hours ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Enhanced Script -->
+  <script>
+    // Set current date
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Get the elements we want to update
+      const patientsEl = document.getElementById('stat-patients');
+      const testsEl = document.getElementById('stat-tests');
+      const staffEl = document.getElementById('stat-staff');
+
+      // Animate numbers on load
+      function animateNumber(element, target) {
+        let current = 0;
+        const increment = target / 20;
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            element.textContent = target;
+            clearInterval(timer);
+          } else {
+            element.textContent = Math.floor(current);
+          }
+        }, 50);
+      }
+
+      // Fetch Patient Count
+      fetch('/api/stats/total-patients')
+        .then(res => res.json())
+        .then(data => {
+          animateNumber(patientsEl, data.total);
+        })
+        .catch(err => {
+          console.error('Error fetching patient stats:', err);
+          patientsEl.textContent = '--';
+        });
+
+      // Fetch Pending Test Count
+      fetch('/api/stats/pending-tests')
+        .then(res => res.json())
+        .then(data => {
+          animateNumber(testsEl, data.total);
+        })
+        .catch(err => {
+          console.error('Error fetching test stats:', err);
+          testsEl.textContent = '--';
+        });
+
+      // Fetch Staff Count
+      fetch('/api/stats/total-staff')
+        .then(res => res.json())
+        .then(data => {
+          animateNumber(staffEl, data.total);
+        })
+        .catch(err => {
+          console.error('Error fetching staff stats:', err);
+          staffEl.textContent = '--';
+        });
+    });
+  </script>
+</body>
+</html>

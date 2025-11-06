@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Staff - Lifeline Diagnostics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        medical: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        },
+                        clinical: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-clinical-50">
+  <div class="flex min-h-screen">
+    
+    <!-- Enhanced Sidebar -->
+    <div class="w-72 bg-gradient-to-b from-medical-900 to-clinical-900 text-white shadow-2xl">
+      <!-- Header Section -->
+      <div class="p-6 border-b border-medical-700">
+        <div class="flex items-center space-x-3 mb-2">
+          <div class="w-10 h-10 bg-medical-500 rounded-lg flex items-center justify-center">
+            <i class="fas fa-heartbeat text-white text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-white">Lifeline Diagnostics</h1>
+            <p class="text-xs text-medical-200">Medical Center System</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Navigation -->
+      <nav class="flex-1 p-6">
+        <ul class="space-y-2">
+          <li>
+            <a href="index.html" class="flex items-center space-x-3 py-3 px-4 rounded-xl hover:bg-medical-800 text-medical-100 hover:text-white transition-all duration-200">
+              <i class="fas fa-chart-line w-5"></i>
+              <span class="font-medium">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="patients.html" class="flex items-center space-x-3 py-3 px-4 rounded-xl hover:bg-medical-800 text-medical-100 hover:text-white transition-all duration-200">
+              <i class="fas fa-users w-5"></i>
+              <span class="font-medium">Patients</span>
+            </a>
+          </li>
+          <li>
+            <a href="tests.html" class="flex items-center space-x-3 py-3 px-4 rounded-xl hover:bg-medical-800 text-medical-100 hover:text-white transition-all duration-200">
+              <i class="fas fa-vials w-5"></i>
+              <span class="font-medium">Laboratory Tests</span>
+            </a>
+          </li>
+          <li>
+            <a href="staff.html" class="flex items-center space-x-3 py-3 px-4 rounded-xl bg-medical-600 text-white shadow-lg transform transition-all duration-200">
+              <i class="fas fa-user-md w-5"></i>
+              <span class="font-medium">Medical Staff</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Footer -->
+      <div class="p-6 border-t border-medical-700">
+        <div class="text-xs text-medical-300">
+          <p class="font-medium">Lifeline Diagnostics</p>
+          <p>&copy; 2025 - Medical Excellence</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 bg-white">
+      <!-- Top Header Bar -->
+      <div class="bg-white border-b border-clinical-200 px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-3xl font-bold text-clinical-800">Medical Staff Directory</h2>
+            <p class="text-clinical-600 mt-1">Manage doctors and laboratory personnel</p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button class="bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2">
+              <i class="fas fa-user-plus"></i>
+              <span>Add Staff Member</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="p-8">
+        <!-- Staff Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-blue-100 text-sm font-medium uppercase tracking-wide">Doctors</p>
+                <p class="text-3xl font-bold mt-2">12</p>
+                <p class="text-blue-100 text-sm mt-1">Referring physicians</p>
+              </div>
+              <div class="w-14 h-14 bg-blue-400 bg-opacity-30 rounded-full flex items-center justify-center">
+                <i class="fas fa-user-md text-2xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-green-100 text-sm font-medium uppercase tracking-wide">Lab Staff</p>
+                <p class="text-3xl font-bold mt-2">8</p>
+                <p class="text-green-100 text-sm mt-1">Laboratory personnel</p>
+              </div>
+              <div class="w-14 h-14 bg-green-400 bg-opacity-30 rounded-full flex items-center justify-center">
+                <i class="fas fa-microscope text-2xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-purple-100 text-sm font-medium uppercase tracking-wide">Total Staff</p>
+                <p class="text-3xl font-bold mt-2">20</p>
+                <p class="text-purple-100 text-sm mt-1">Active members</p>
+              </div>
+              <div class="w-14 h-14 bg-purple-400 bg-opacity-30 rounded-full flex items-center justify-center">
+                <i class="fas fa-users text-2xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          
+          <!-- Referring Doctors Section -->
+          <div class="bg-white rounded-2xl shadow-lg border border-clinical-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-clinical-200 bg-gradient-to-r from-blue-50 to-blue-100">
+              <h3 class="text-xl font-bold text-clinical-800 flex items-center">
+                <i class="fas fa-user-md text-blue-600 mr-3"></i>
+                Referring Doctors
+              </h3>
+              <p class="text-clinical-600 text-sm mt-1">External physicians referring patients</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-clinical-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-clinical-600 uppercase tracking-wider">Doctor</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-clinical-600 uppercase tracking-wider">Specialization</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-clinical-600 uppercase tracking-wider">Contact</th>
+                  </tr>
+                </thead>
+                <tbody id="doctor-table-body" class="bg-white divide-y divide-clinical-200">
+                  <tr>
+                    <td colspan="3" class="px-6 py-8 text-center">
+                      <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 bg-clinical-100 rounded-full flex items-center justify-center mb-3">
+                          <i class="fas fa-spinner fa-spin text-clinical-400"></i>
+                        </div>
+                        <p class="text-clinical-500 font-medium">Loading doctors...</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Lab Staff Section -->
+          <div class="bg-white rounded-2xl shadow-lg border border-clinical-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-clinical-200 bg-gradient-to-r from-green-50 to-green-100">
+              <h3 class="text-xl font-bold text-clinical-800 flex items-center">
+                <i class="fas fa-microscope text-green-600 mr-3"></i>
+                Laboratory Staff
+              </h3>
+              <p class="text-clinical-600 text-sm mt-1">Internal lab personnel and reviewers</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-clinical-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-clinical-600 uppercase tracking-wider">Staff Member</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-clinical-600 uppercase tracking-wider">Role</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-clinical-600 uppercase tracking-wider">Department</th>
+                  </tr>
+                </thead>
+                <tbody id="reviewer-table-body" class="bg-white divide-y divide-clinical-200">
+                  <tr>
+                    <td colspan="3" class="px-6 py-8 text-center">
+                      <div class="flex flex-col items-center">
+                        <div class="w-12 h-12 bg-clinical-100 rounded-full flex items-center justify-center mb-3">
+                          <i class="fas fa-spinner fa-spin text-clinical-400"></i>
+                        </div>
+                        <p class="text-clinical-500 font-medium">Loading lab staff...</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Enhanced Script -->
+  <script>
+    // Helper function to show errors
+    function showError(tableBody, colSpan, message) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="${colSpan}" class="px-6 py-8 text-center">
+            <div class="flex flex-col items-center">
+              <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                <i class="fas fa-exclamation-triangle text-red-500"></i>
+              </div>
+              <p class="text-red-600 font-medium">Error loading data</p>
+              <p class="text-clinical-500 text-sm mt-1">${message}</p>
+              <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-medical-500 text-white rounded-lg hover:bg-medical-600 transition-colors">
+                Try Again
+              </button>
+            </div>
+          </td>
+        </tr>`;
+    }
+
+    // Helper function to show empty state
+    function showEmpty(tableBody, colSpan, title, subtitle) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="${colSpan}" class="px-6 py-8 text-center">
+            <div class="flex flex-col items-center">
+              <div class="w-12 h-12 bg-clinical-100 rounded-full flex items-center justify-center mb-3">
+                <i class="fas fa-users text-clinical-400"></i>
+              </div>
+              <p class="text-clinical-500 font-medium">${title}</p>
+              <p class="text-clinical-400 text-sm">${subtitle}</p>
+            </div>
+          </td>
+        </tr>`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      
+      // --- 1. Fetch Doctors ---
+      const doctorTableBody = document.getElementById('doctor-table-body');
+      fetch('/api/doctors')
+        .then(response => {
+          if (!response.ok) throw new Error('Network error');
+          return response.json();
+        })
+        .then(doctors => {
+          doctorTableBody.innerHTML = ''; // Clear loading
+          if (doctors.length === 0) {
+            showEmpty(doctorTableBody, 3, 'No doctors found', 'Add referring doctors to get started');
+            return;
+          }
+          doctors.forEach((doctor, index) => {
+            const row = document.createElement('tr');
+            row.classList.add('hover:bg-clinical-50', 'transition-colors', 'duration-150');
+            
+            // Get specialization icon
+            const spec = doctor.specialization.toLowerCase();
+            let specIcon = 'fas fa-stethoscope';
+            if (spec.includes('cardio')) specIcon = 'fas fa-heartbeat';
+            else if (spec.includes('neuro')) specIcon = 'fas fa-brain';
+            else if (spec.includes('ortho')) specIcon = 'fas fa-bone';
+            else if (spec.includes('radio')) specIcon = 'fas fa-x-ray';
+            
+            row.innerHTML = `
+              <td class="px-6 py-4">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-medium mr-3">
+                    Dr
+                  </div>
+                  <div>
+                    <p class="font-semibold text-clinical-900">Dr. ${doctor.first_name} ${doctor.last_name}</p>
+                    <p class="text-sm text-clinical-500">Referring Physician</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center">
+                  <i class="${specIcon} text-blue-500 mr-2"></i>
+                  <span class="text-clinical-700">${doctor.specialization}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center text-clinical-700">
+                  <i class="fas fa-phone text-clinical-400 mr-2"></i>
+                  ${doctor.contact_number}
+                </div>
+              </td>
+            `;
+            doctorTableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching doctors:', error);
+          showError(doctorTableBody, 3, 'Could not fetch doctor data.');
+        });
+
+      // --- 2. Fetch Reviewers ---
+      const reviewerTableBody = document.getElementById('reviewer-table-body');
+      fetch('/api/reviewers')
+        .then(response => {
+          if (!response.ok) throw new Error('Network error');
+          return response.json();
+        })
+        .then(reviewers => {
+          reviewerTableBody.innerHTML = ''; // Clear loading
+          if (reviewers.length === 0) {
+            showEmpty(reviewerTableBody, 3, 'No lab staff found', 'Add laboratory personnel to get started');
+            return;
+          }
+          reviewers.forEach((reviewer, index) => {
+            const row = document.createElement('tr');
+            row.classList.add('hover:bg-clinical-50', 'transition-colors', 'duration-150');
+            
+            // Get role icon
+            const role = reviewer.role.toLowerCase();
+            let roleIcon = 'fas fa-user';
+            if (role.includes('technician')) roleIcon = 'fas fa-microscope';
+            else if (role.includes('analyst')) roleIcon = 'fas fa-chart-line';
+            else if (role.includes('supervisor')) roleIcon = 'fas fa-user-tie';
+            else if (role.includes('pathologist')) roleIcon = 'fas fa-stethoscope';
+            
+            row.innerHTML = `
+              <td class="px-6 py-4">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center text-white font-medium mr-3">
+                    ${reviewer.first_name.charAt(0)}${reviewer.last_name.charAt(0)}
+                  </div>
+                  <div>
+                    <p class="font-semibold text-clinical-900">${reviewer.first_name} ${reviewer.last_name}</p>
+                    <p class="text-sm text-clinical-500">Lab Personnel</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center">
+                  <i class="${roleIcon} text-green-500 mr-2"></i>
+                  <span class="text-clinical-700">${reviewer.role}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  ${reviewer.department_name || 'General Lab'}
+                </span>
+              </td>
+            `;
+            reviewerTableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching reviewers:', error);
+          showError(reviewerTableBody, 3, 'Could not fetch reviewer data.');
+        });
+    });
+  </script>
+</body>
+</html>

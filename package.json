@@ -1,14 +1,16 @@
 {
-  "name": "diagnostic-centre",
+  "name": "lifeline-diagnostics",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Medical diagnostic center management system",
+  "main": "backend/server.js",
   "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["medical", "diagnostics", "healthcare", "management"],
+  "author": "Lifeline Diagnostics",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
