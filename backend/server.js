@@ -128,6 +128,102 @@ app.get('/api/stats/total-staff', async (req, res) => {
   }
 });
 
+// API to get detailed test statistics
+app.get('/api/stats/test-breakdown', async (req, res) => {
+  try {
+    const [pendingRows] = await db.query('SELECT COUNT(*) as count FROM Test WHERE status = "Pending"');
+    const [progressRows] = await db.query('SELECT COUNT(*) as count FROM Test WHERE status IN ("Scheduled", "In Progress")');
+    const [completedRows] = await db.query('SELECT COUNT(*) as count FROM Test WHERE status = "Completed"');
+    const [todayRows] = await db.query('SELECT COUNT(*) as count FROM Test WHERE DATE(test_date) = CURDATE()');
+    
+    res.json({
+      pending: pendingRows[0].count,
+      inProgress: progressRows[0].count,
+      completed: completedRows[0].count,
+      today: todayRows[0].count
+    });
+  } catch (err) {
+    console.error('Error fetching test statistics:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// API to get recent activity for dashboard
+app.get('/api/stats/recent-activity', async (req, res) => {
+  try {
+    // Get recent patients (last 3)
+    const [recentPatients] = await db.query(`
+      SELECT first_name, last_name, patient_id, registration_date 
+      FROM Patient 
+      ORDER BY registration_date DESC 
+      LIMIT 3
+    `);
+    
+    // Get recent tests (last 3)
+    const [recentTests] = await db.query(`
+      SELECT t.test_name, t.test_id, t.patient_id, t.test_date, t.status,
+             p.first_name, p.last_name
+      FROM Test t
+      JOIN Patient p ON t.patient_id = p.patient_id
+      ORDER BY t.test_date DESC 
+      LIMIT 3
+    `);
+    
+    // Combine and format activities
+    const activities = [];
+    
+    // Add recent patients
+    recentPatients.forEach(patient => {
+      activities.push({
+        type: 'patient_registered',
+        title: 'New patient registered',
+        description: `${patient.first_name} ${patient.last_name} - ID: ${patient.patient_id}`,
+        timestamp: patient.registration_date,
+        icon: 'fas fa-user-plus',
+        iconColor: 'blue'
+      });
+    });
+    
+    // Add recent tests
+    recentTests.forEach(test => {
+      const activity = {
+        title: '',
+        description: `${test.test_name} - Patient: ${test.first_name} ${test.last_name}`,
+        timestamp: test.test_date,
+        icon: '',
+        iconColor: ''
+      };
+      
+      if (test.status === 'Completed') {
+        activity.type = 'test_completed';
+        activity.title = 'Test completed';
+        activity.icon = 'fas fa-check-circle';
+        activity.iconColor = 'green';
+      } else if (test.status === 'Pending') {
+        activity.type = 'test_scheduled';
+        activity.title = 'Test scheduled';
+        activity.icon = 'fas fa-calendar-plus';
+        activity.iconColor = 'orange';
+      } else {
+        activity.type = 'test_in_progress';
+        activity.title = 'Test in progress';
+        activity.icon = 'fas fa-flask';
+        activity.iconColor = 'blue';
+      }
+      
+      activities.push(activity);
+    });
+    
+    // Sort by timestamp and return latest 5
+    activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    res.json(activities.slice(0, 5));
+    
+  } catch (err) {
+    console.error('Error fetching recent activity:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // --- API ENDPOINTS FOR ACTIONS ---
 
 // API to register a new patient (using the existing stored procedure)

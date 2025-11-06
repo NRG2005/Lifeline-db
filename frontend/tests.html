@@ -101,7 +101,7 @@
             <p class="text-clinical-600 mt-1">Manage test schedules and results</p>
           </div>
           <div class="flex items-center space-x-4">
-            <button class="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2">
+            <button onclick="showScheduleForm()" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2">
               <i class="fas fa-calendar-plus"></i>
               <span>Schedule New Test</span>
             </button>
@@ -117,7 +117,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm opacity-90">Pending</p>
-                <p class="text-2xl font-bold">12</p>
+                <p id="stat-pending" class="text-2xl font-bold">0</p>
               </div>
               <i class="fas fa-clock text-2xl opacity-75"></i>
             </div>
@@ -126,7 +126,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm opacity-90">In Progress</p>
-                <p class="text-2xl font-bold">8</p>
+                <p id="stat-progress" class="text-2xl font-bold">0</p>
               </div>
               <i class="fas fa-flask text-2xl opacity-75"></i>
             </div>
@@ -135,7 +135,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm opacity-90">Completed</p>
-                <p class="text-2xl font-bold">45</p>
+                <p id="stat-completed" class="text-2xl font-bold">0</p>
               </div>
               <i class="fas fa-check-circle text-2xl opacity-75"></i>
             </div>
@@ -144,7 +144,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm opacity-90">Today</p>
-                <p class="text-2xl font-bold">6</p>
+                <p id="stat-today" class="text-2xl font-bold">0</p>
               </div>
               <i class="fas fa-calendar-day text-2xl opacity-75"></i>
             </div>
@@ -221,6 +221,12 @@
     window.addEventListener('DOMContentLoaded', () => {
       const tableBody = document.getElementById('test-table-body');
       
+      // Get stat elements
+      const pendingEl = document.getElementById('stat-pending');
+      const progressEl = document.getElementById('stat-progress');
+      const completedEl = document.getElementById('stat-completed');
+      const todayEl = document.getElementById('stat-today');
+      
       // Fetch data from our new API endpoint
       fetch('/api/tests')
         .then(response => {
@@ -230,6 +236,32 @@
           return response.json();
         })
         .then(tests => {
+          // Calculate statistics
+          let pendingCount = 0;
+          let progressCount = 0;
+          let completedCount = 0;
+          let todayCount = 0;
+          const today = new Date().toDateString();
+          
+          tests.forEach(test => {
+            const status = test.status ? test.status.toLowerCase() : 'pending';
+            const testDate = new Date(test.test_date).toDateString();
+            
+            // Count by status
+            if (status === 'pending') pendingCount++;
+            else if (status === 'scheduled' || status === 'in progress') progressCount++;
+            else if (status === 'completed') completedCount++;
+            
+            // Count today's tests
+            if (testDate === today) todayCount++;
+          });
+          
+          // Update stat cards
+          pendingEl.textContent = pendingCount;
+          progressEl.textContent = progressCount;
+          completedEl.textContent = completedCount;
+          todayEl.textContent = todayCount;
+          
           // Clear the loading message
           tableBody.innerHTML = ''; 
 
@@ -366,6 +398,11 @@
             </tr>`;
         });
     });
+
+    // Placeholder function for schedule form
+    function showScheduleForm() {
+      alert('Test scheduling form will be implemented here.\nBackend API endpoint is ready: POST /api/tests/schedule');
+    }
   </script>
 </body>
 </html>
