@@ -144,6 +144,38 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE DeletePatient(
+    IN p_patient_id INT
+)
+BEGIN
+    -- First, check if patient has any tests
+    DECLARE test_count INT;
+    SELECT COUNT(*) INTO test_count FROM Test WHERE patient_id = p_patient_id;
+    
+    IF test_count > 0 THEN
+        -- Delete all tests associated with the patient
+        DELETE FROM Test WHERE patient_id = p_patient_id;
+    END IF;
+    
+    -- Delete companions associated with the patient
+    DELETE FROM Companion WHERE patient_id = p_patient_id;
+    
+    -- Finally, delete the patient
+    DELETE FROM Patient WHERE patient_id = p_patient_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE DeleteTest(
+    IN p_test_id INT
+)
+BEGIN
+    -- Simply delete the test
+    DELETE FROM Test WHERE test_id = p_test_id;
+END$$
+DELIMITER ;
+
 -- 5. Create Function
 DELIMITER //
 CREATE FUNCTION CalculateAge(
