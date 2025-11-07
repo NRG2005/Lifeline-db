@@ -117,15 +117,15 @@
             <div class="flex-1">
               <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-clinical-400"></i>
-                <input type="text" placeholder="Search patients by name, ID, or contact..." class="w-full pl-10 pr-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
+                <input id="searchInput" type="text" placeholder="Search patients by name, ID, or contact..." class="w-full pl-10 pr-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
               </div>
             </div>
             <div class="flex gap-2">
-              <select class="px-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
-                <option>All Genders</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
+              <select id="genderFilter" class="px-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
+                <option value="">All Genders</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </select>
               <button class="px-6 py-3 bg-clinical-100 text-clinical-700 rounded-xl hover:bg-clinical-200 transition-colors">
                 <i class="fas fa-filter"></i>
@@ -444,6 +444,9 @@
 
   <!-- Enhanced Script -->
   <script>
+    // Store all patients data globally for filtering
+    let allPatients = [];
+
     window.addEventListener('DOMContentLoaded', () => {
       const tableBody = document.getElementById('patient-table-body');
       
@@ -456,88 +459,11 @@
           return response.json();
         })
         .then(patients => {
-          // Clear the loading message
-          tableBody.innerHTML = ''; 
-
-          if (patients.length === 0) {
-            tableBody.innerHTML = `
-              <tr>
-                <td colspan="6" class="px-6 py-12 text-center">
-                  <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 bg-clinical-100 rounded-full flex items-center justify-center mb-4">
-                      <i class="fas fa-users text-2xl text-clinical-400"></i>
-                    </div>
-                    <p class="text-clinical-500 font-medium">No patients found</p>
-                    <p class="text-clinical-400 text-sm">Register your first patient to get started</p>
-                  </div>
-                </td>
-              </tr>`;
-            return;
-          }
-
-          // Loop through each patient and create a table row
-          patients.forEach((patient, index) => {
-            const row = document.createElement('tr');
-            row.classList.add('hover:bg-clinical-50', 'transition-colors', 'duration-150');
-            
-            row.innerHTML = `
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-8 h-8 bg-medical-100 text-medical-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                    ${String(patient.patient_id).slice(-2)}
-                  </div>
-                  <span class="font-medium text-clinical-900">${patient.patient_id}</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-medium mr-3">
-                    ${patient.first_name.charAt(0)}${patient.last_name.charAt(0)}
-                  </div>
-                  <div>
-                    <p class="font-semibold text-clinical-900">${patient.first_name} ${patient.last_name}</p>
-                    <p class="text-sm text-clinical-500">Patient</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center text-clinical-700">
-                  <i class="fas fa-phone text-clinical-400 mr-2"></i>
-                  ${patient.contact_number}
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center text-clinical-700">
-                  <i class="fas fa-envelope text-clinical-400 mr-2"></i>
-                  ${patient.email}
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                  patient.gender.toLowerCase() === 'male' ? 'bg-blue-100 text-blue-800' :
-                  patient.gender.toLowerCase() === 'female' ? 'bg-pink-100 text-pink-800' :
-                  'bg-gray-100 text-gray-800'
-                }">
-                  ${patient.gender}
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center space-x-2">
-                  <button onclick="viewPatient(${patient.patient_id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Edit Patient">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button onclick="deletePatient(${patient.patient_id}, '${patient.first_name} ${patient.last_name}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Patient">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </div>
-              </td>
-            `;
-            
-            tableBody.appendChild(row);
-          });
+          // Store patients globally
+          allPatients = patients;
+          
+          // Display all patients initially
+          displayPatients(patients);
         })
         .catch(error => {
           console.error('Error fetching patients:', error);
@@ -557,6 +483,133 @@
               </td>
             </tr>`;
         });
+    });
+
+    // Function to display patients in the table
+    function displayPatients(patients) {
+      const tableBody = document.getElementById('patient-table-body');
+      
+      // Clear the table
+      tableBody.innerHTML = ''; 
+
+      if (patients.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="px-6 py-12 text-center">
+              <div class="flex flex-col items-center">
+                <div class="w-16 h-16 bg-clinical-100 rounded-full flex items-center justify-center mb-4">
+                  <i class="fas fa-users text-2xl text-clinical-400"></i>
+                </div>
+                <p class="text-clinical-500 font-medium">No patients found</p>
+                <p class="text-clinical-400 text-sm">Try adjusting your search or filters</p>
+              </div>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      // Loop through each patient and create a table row
+      patients.forEach((patient, index) => {
+        const row = document.createElement('tr');
+        row.classList.add('hover:bg-clinical-50', 'transition-colors', 'duration-150');
+        
+        row.innerHTML = `
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-medical-100 text-medical-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
+                ${String(patient.patient_id).slice(-2)}
+              </div>
+              <span class="font-medium text-clinical-900">${patient.patient_id}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-medium mr-3">
+                ${patient.first_name.charAt(0)}${patient.last_name.charAt(0)}
+              </div>
+              <div>
+                <p class="font-semibold text-clinical-900">${patient.first_name} ${patient.last_name}</p>
+                <p class="text-sm text-clinical-500">Patient</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center text-clinical-700">
+              <i class="fas fa-phone text-clinical-400 mr-2"></i>
+              ${patient.contact_number}
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center text-clinical-700">
+              <i class="fas fa-envelope text-clinical-400 mr-2"></i>
+              ${patient.email}
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+              patient.gender.toLowerCase() === 'male' ? 'bg-blue-100 text-blue-800' :
+              patient.gender.toLowerCase() === 'female' ? 'bg-pink-100 text-pink-800' :
+              'bg-gray-100 text-gray-800'
+            }">
+              ${patient.gender}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center space-x-2">
+              <button onclick="viewPatient(${patient.patient_id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Edit Patient">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deletePatient(${patient.patient_id}, '${patient.first_name} ${patient.last_name}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Patient">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Function to filter patients based on search and gender filter
+    function filterPatients() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const genderFilter = document.getElementById('genderFilter').value;
+
+      const filteredPatients = allPatients.filter(patient => {
+        // Search filter - check if search term matches name, ID, or contact
+        const matchesSearch = 
+          patient.first_name.toLowerCase().includes(searchTerm) ||
+          patient.last_name.toLowerCase().includes(searchTerm) ||
+          (patient.first_name + ' ' + patient.last_name).toLowerCase().includes(searchTerm) ||
+          String(patient.patient_id).toLowerCase().includes(searchTerm) ||
+          (patient.contact_number && patient.contact_number.includes(searchTerm));
+
+        // Gender filter
+        const matchesGender = !genderFilter || patient.gender === genderFilter;
+
+        return matchesSearch && matchesGender;
+      });
+
+      displayPatients(filteredPatients);
+    }
+
+    // Add event listeners for search and filter
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('searchInput');
+      const genderFilter = document.getElementById('genderFilter');
+
+      // Search as user types (with debounce for better performance)
+      let searchTimeout;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterPatients, 300);
+      });
+
+      // Filter when gender selection changes
+      genderFilter.addEventListener('change', filterPatients);
     });
 
     // Show registration modal
