@@ -157,17 +157,17 @@
             <div class="flex-1">
               <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-clinical-400"></i>
-                <input type="text" placeholder="Search tests by name, patient ID, or test ID..." class="w-full pl-10 pr-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
+                <input id="searchInput" type="text" placeholder="Search tests by name, patient ID, or test ID..." class="w-full pl-10 pr-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
               </div>
             </div>
             <div class="flex gap-2">
-              <select class="px-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
-                <option>All Status</option>
-                <option>Pending</option>
-                <option>In Progress</option>
-                <option>Completed</option>
+              <select id="statusFilter" class="px-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
+                <option value="">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
               </select>
-              <input type="date" class="px-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
+              <input id="dateFilter" type="date" class="px-4 py-3 border border-clinical-300 rounded-xl focus:ring-2 focus:ring-medical-500 focus:border-transparent">
               <button class="px-6 py-3 bg-clinical-100 text-clinical-700 rounded-xl hover:bg-clinical-200 transition-colors">
                 <i class="fas fa-filter"></i>
               </button>
@@ -454,6 +454,9 @@
 
   <!-- Enhanced Script -->
   <script>
+    // Store all tests data globally for filtering
+    let allTests = [];
+
     window.addEventListener('DOMContentLoaded', () => {
       const tableBody = document.getElementById('test-table-body');
       
@@ -472,145 +475,14 @@
           return response.json();
         })
         .then(tests => {
-          // Calculate statistics
-          let pendingCount = 0;
-          let progressCount = 0;
-          let completedCount = 0;
-          let todayCount = 0;
-          const today = new Date().toDateString();
+          // Store tests globally
+          allTests = tests;
           
-          tests.forEach(test => {
-            const status = test.status ? test.status.toLowerCase() : 'pending';
-            const testDate = new Date(test.test_date).toDateString();
-            
-            // Count by status
-            if (status === 'pending') pendingCount++;
-            else if (status === 'scheduled' || status === 'in progress') progressCount++;
-            else if (status === 'completed') completedCount++;
-            
-            // Count today's tests
-            if (testDate === today) todayCount++;
-          });
+          // Calculate and update statistics
+          updateStatistics(tests);
           
-          // Update stat cards
-          pendingEl.textContent = pendingCount;
-          progressEl.textContent = progressCount;
-          completedEl.textContent = completedCount;
-          todayEl.textContent = todayCount;
-          
-          // Clear the loading message
-          tableBody.innerHTML = ''; 
-
-          if (tests.length === 0) {
-            tableBody.innerHTML = `
-              <tr>
-                <td colspan="7" class="px-6 py-12 text-center">
-                  <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 bg-clinical-100 rounded-full flex items-center justify-center mb-4">
-                      <i class="fas fa-vials text-2xl text-clinical-400"></i>
-                    </div>
-                    <p class="text-clinical-500 font-medium">No tests scheduled</p>
-                    <p class="text-clinical-400 text-sm">Schedule your first test to get started</p>
-                  </div>
-                </td>
-              </tr>`;
-            return;
-          }
-
-          // Loop through each test and create a table row
-          tests.forEach((test, index) => {
-            const row = document.createElement('tr');
-            row.classList.add('hover:bg-clinical-50', 'transition-colors', 'duration-150');
-            
-            // Format the date to be more readable
-            const testDate = new Date(test.test_date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            });
-            
-            // Create status badge with enhanced styling
-            let statusBadge;
-            const status = test.status ? test.status.toLowerCase() : 'pending';
-            if (status === 'pending') {
-              statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                <i class="fas fa-clock mr-1"></i>Pending
-              </span>`;
-            } else if (status === 'scheduled' || status === 'in progress') {
-              statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                <i class="fas fa-flask mr-1"></i>In Progress
-              </span>`;
-            } else {
-              statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                <i class="fas fa-check-circle mr-1"></i>Completed
-              </span>`;
-            }
-
-            // Get test icon based on test name
-            let testIcon = 'fas fa-vial';
-            const testName = test.test_name.toLowerCase();
-            if (testName.includes('blood')) testIcon = 'fas fa-tint';
-            else if (testName.includes('x-ray') || testName.includes('scan')) testIcon = 'fas fa-x-ray';
-            else if (testName.includes('urine')) testIcon = 'fas fa-vials';
-            else if (testName.includes('ecg') || testName.includes('ekg')) testIcon = 'fas fa-heartbeat';
-
-            row.innerHTML = `
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-10 h-10 bg-medical-100 rounded-lg flex items-center justify-center mr-3">
-                    <i class="${testIcon} text-medical-600"></i>
-                  </div>
-                  <div>
-                    <p class="font-semibold text-clinical-900">${test.test_name}</p>
-                    <p class="text-sm text-clinical-500">ID: ${test.test_id}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                    P
-                  </div>
-                  <span class="font-medium text-clinical-700">${test.patient_id}</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center">
-                  <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                    Dr
-                  </div>
-                  <span class="font-medium text-clinical-700">${test.doctor_id}</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-clinical-100 text-clinical-800">
-                  ${test.department_id}
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center text-clinical-700">
-                  <i class="fas fa-calendar text-clinical-400 mr-2"></i>
-                  ${testDate}
-                </div>
-              </td>
-              <td class="px-6 py-4">${statusBadge}</td>
-              <td class="px-6 py-4">
-                <div class="flex items-center space-x-2">
-                  <button onclick="viewTest(${test.test_id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Edit Test">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button onclick="deleteTest(${test.test_id}, '${test.test_name}', '${test.patient_id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Test">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </div>
-              </td>
-            `;
-            
-            tableBody.appendChild(row);
-          });
+          // Display all tests initially
+          displayTests(tests);
         })
         .catch(error => {
           console.error('Error fetching tests:', error);
@@ -630,6 +502,217 @@
               </td>
             </tr>`;
         });
+    });
+
+    // Function to update statistics
+    function updateStatistics(tests) {
+      const pendingEl = document.getElementById('stat-pending');
+      const progressEl = document.getElementById('stat-progress');
+      const completedEl = document.getElementById('stat-completed');
+      const todayEl = document.getElementById('stat-today');
+      
+      let pendingCount = 0;
+      let progressCount = 0;
+      let completedCount = 0;
+      let todayCount = 0;
+      const today = new Date().toDateString();
+      
+      tests.forEach(test => {
+        const status = test.status ? test.status.toLowerCase() : 'pending';
+        const testDate = new Date(test.test_date).toDateString();
+        
+        // Count by status
+        if (status === 'pending') pendingCount++;
+        else if (status === 'scheduled' || status === 'in progress') progressCount++;
+        else if (status === 'completed') completedCount++;
+        
+        // Count today's tests
+        if (testDate === today) todayCount++;
+      });
+      
+      // Update stat cards
+      pendingEl.textContent = pendingCount;
+      progressEl.textContent = progressCount;
+      completedEl.textContent = completedCount;
+      todayEl.textContent = todayCount;
+    }
+
+    // Function to display tests in the table
+    function displayTests(tests) {
+      const tableBody = document.getElementById('test-table-body');
+      
+      // Clear the table
+      tableBody.innerHTML = ''; 
+
+      if (tests.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-6 py-12 text-center">
+              <div class="flex flex-col items-center">
+                <div class="w-16 h-16 bg-clinical-100 rounded-full flex items-center justify-center mb-4">
+                  <i class="fas fa-vials text-2xl text-clinical-400"></i>
+                </div>
+                <p class="text-clinical-500 font-medium">No tests found</p>
+                <p class="text-clinical-400 text-sm">Try adjusting your search or filters</p>
+              </div>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      // Loop through each test and create a table row
+      tests.forEach((test, index) => {
+        const row = document.createElement('tr');
+        row.classList.add('hover:bg-clinical-50', 'transition-colors', 'duration-150');
+        
+        // Format the date to be more readable
+        const testDate = new Date(test.test_date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+        
+        // Create status badge with enhanced styling
+        let statusBadge;
+        const status = test.status ? test.status.toLowerCase() : 'pending';
+        if (status === 'pending') {
+          statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+            <i class="fas fa-clock mr-1"></i>Pending
+          </span>`;
+        } else if (status === 'scheduled' || status === 'in progress') {
+          statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <i class="fas fa-flask mr-1"></i>In Progress
+          </span>`;
+        } else {
+          statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <i class="fas fa-check-circle mr-1"></i>Completed
+          </span>`;
+        }
+
+        // Get test icon based on test name
+        let testIcon = 'fas fa-vial';
+        const testName = test.test_name.toLowerCase();
+        if (testName.includes('blood')) testIcon = 'fas fa-tint';
+        else if (testName.includes('x-ray') || testName.includes('scan')) testIcon = 'fas fa-x-ray';
+        else if (testName.includes('urine')) testIcon = 'fas fa-vials';
+        else if (testName.includes('ecg') || testName.includes('ekg')) testIcon = 'fas fa-heartbeat';
+
+        row.innerHTML = `
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-medical-100 rounded-lg flex items-center justify-center mr-3">
+                <i class="${testIcon} text-medical-600"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-clinical-900">${test.test_name}</p>
+                <p class="text-sm text-clinical-500">ID: ${test.test_id}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
+                P
+              </div>
+              <span class="font-medium text-clinical-700">${test.patient_id}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
+                Dr
+              </div>
+              <span class="font-medium text-clinical-700">${test.doctor_id}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-clinical-100 text-clinical-800">
+              ${test.department_id}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center text-clinical-700">
+              <i class="fas fa-calendar text-clinical-400 mr-2"></i>
+              ${testDate}
+            </div>
+          </td>
+          <td class="px-6 py-4">${statusBadge}</td>
+          <td class="px-6 py-4">
+            <div class="flex items-center space-x-2">
+              <button onclick="viewTest(${test.test_id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Edit Test">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deleteTest(${test.test_id}, '${test.test_name}', '${test.patient_id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Test">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Function to filter tests based on search, status, and date
+    function filterTests() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value;
+      const dateFilter = document.getElementById('dateFilter').value;
+
+      const filteredTests = allTests.filter(test => {
+        // Search filter - check if search term matches test name, patient ID, or test ID
+        const matchesSearch = 
+          test.test_name.toLowerCase().includes(searchTerm) ||
+          String(test.patient_id).toLowerCase().includes(searchTerm) ||
+          String(test.test_id).toLowerCase().includes(searchTerm);
+
+        // Status filter
+        let matchesStatus = true;
+        if (statusFilter) {
+          const testStatus = test.status ? test.status.toLowerCase() : 'pending';
+          if (statusFilter === 'Pending') {
+            matchesStatus = testStatus === 'pending';
+          } else if (statusFilter === 'In Progress') {
+            matchesStatus = testStatus === 'scheduled' || testStatus === 'in progress';
+          } else if (statusFilter === 'Completed') {
+            matchesStatus = testStatus === 'completed';
+          }
+        }
+
+        // Date filter
+        let matchesDate = true;
+        if (dateFilter) {
+          const testDate = new Date(test.test_date).toISOString().split('T')[0];
+          matchesDate = testDate === dateFilter;
+        }
+
+        return matchesSearch && matchesStatus && matchesDate;
+      });
+
+      displayTests(filteredTests);
+    }
+
+    // Add event listeners for search and filters
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('searchInput');
+      const statusFilter = document.getElementById('statusFilter');
+      const dateFilter = document.getElementById('dateFilter');
+
+      // Search as user types (with debounce for better performance)
+      let searchTimeout;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterTests, 300);
+      });
+
+      // Filter when status selection changes
+      statusFilter.addEventListener('change', filterTests);
+
+      // Filter when date changes
+      dateFilter.addEventListener('change', filterTests);
     });
 
     // Show schedule modal
